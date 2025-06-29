@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+dist
+config/gemini_settings.json
