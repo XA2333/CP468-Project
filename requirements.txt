@@ -1,0 +1,6 @@
+pygame
+numpy
+google.generativeai
+matplotlib
+pandas
+networkx
