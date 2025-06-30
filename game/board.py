@@ -17,6 +17,6 @@ class Board:
   def is_game_over(): pass
   def get_winner(): pass
   def get_state(): pass
-  def get_current_player(): pass
+  # def get_current_player(): pass - implemented in Game class
   def reset(): pass
   # def __str__(): pass

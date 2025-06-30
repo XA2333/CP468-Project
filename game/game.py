@@ -8,8 +8,48 @@
 # Feel free to add parameters or adjust these functions as needed
 # =========================
 class Game:
-  def __init__(self, size=3, agent1=None, agent2=None): pass
-  def switch_player(): pass
-  def get_current_agent(): pass
-  def play(): pass
+  def __init__(self, board, agent1=None, agent2=None, size = 3):
+    self.board = board # The game board instance
+    self.agent1 = agent1
+    self.agent2 = agent2
+    self.current_player = 1
+    self.size = size # Dont know if we are going to do 4x4
+    return
+  
+  def switch_player(self):
+    """Switch between player 1 and player 2"""
+    if self.current_player == 1:
+      self.current_player = 2
+    elif self.current_player == 2:
+      self.current_player = 1
+    return
+  
+  def get_current_agent(self): 
+    """Get the current agent based on the current player"""
+    if self.current_player == 1:
+        return self.agent1
+    elif self.current_player == 2:
+        return self.agent2
 
+  def play(self):
+    print("Starting game...")
+    # Main game loop
+    while not self.board.is_game_over() and not self.board.is_full(): #while game not over and board is not full
+      agent = self.get_current_agent()
+
+      move = agent.get_move(self.board) # NOTE: for whoever is implimenting the agents here is where you would get all the moves
+      if not self.board.is_valid_move(move):
+          print(f"Invalid move by {agent}. Try again.")
+          continue
+      self.board.make_move(self.current_player,move)
+
+      print(f"Player {self.get_current_agent()} made a move {move}.")
+
+      self.switch_player()  # Switch to the next player
+    
+    # Game over handling
+    winner = self.board.get_winner()
+    if winner:
+        print(f"Game Over! Player {winner} wins!")
+    else:
+        print("Game Over! It's a draw.")

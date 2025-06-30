@@ -9,5 +9,7 @@
 # Feel free to add parameters or adjust these functions as needed
 # =========================
 class HumanAgent:
-  def __init__(self): pass
+  def __init__(self,board):
+    # Initialize the agent with the game board
+    self.board = board
   def get_move(): pass
