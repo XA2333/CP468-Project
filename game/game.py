@@ -37,7 +37,7 @@ class Game:
     while not self.board.is_game_over() and not self.board.is_full(): #while game not over and board is not full
       agent = self.get_current_agent()
 
-      move = agent.get_move(self.board) # NOTE: for whoever is implimenting the agents here is where you would get all the moves
+      move = agent.get_action(self.board) # NOTE: for whoever is implimenting the agents here is where you would get all the moves
       if not self.board.is_valid_move(move):
           print(f"Invalid move by {agent}. Try again.")
           continue

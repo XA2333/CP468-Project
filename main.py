@@ -20,6 +20,12 @@ AVAILABLE_AGENTS = {
     'gemini': GeminiAgent
 }
 
+# Simple evaluation function for AI agents
+def simple_eval_function(state):
+    """Simple evaluation function - returns random score for now"""
+    import random
+    return random.randint(-10, 10)
+
 def get_agent(agent_type=None):
     """
     Dynamically create an agent based on type.
@@ -34,20 +40,24 @@ def get_agent(agent_type=None):
         return None
     
     agent_type = agent_type.lower()
-    if agent_type in AVAILABLE_AGENTS:
-        return AVAILABLE_AGENTS[agent_type](Board()) #init agent and return
+    
+    if agent_type == 'alphabeta':
+        return AlphaBetaAgent(eval_fn=simple_eval_function, max_depth=3)
+    elif agent_type == 'expectiminimax':
+        return ExpectiminimaxAgent(eval_fn=simple_eval_function, max_depth=3)
+    elif agent_type in AVAILABLE_AGENTS:
+        # For human, minimax, gemini agents 
+        return AVAILABLE_AGENTS[agent_type]()
     else:
         print(f"Unknown agent type: {agent_type}")
         return None
-    
+
 def main():
-    # test the game with a human and minmax agent
+    # test the game with a human and alphabeta agent
     agent1 = get_agent('human')
-    agent2 = get_agent('minimax')
+    agent2 = get_agent('alphabeta')
     board = Board()
-    
-    
-    
+    # Uncomment the following lines to test with other agents 
     game = Game(board, agent1=agent1, agent2=agent2)
     game.play()
 
