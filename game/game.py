@@ -13,9 +13,9 @@ class Game:
     self.agent1 = agent1
     self.agent2 = agent2
     self.current_player = 1
-    self.size = size # Dont know if we are going to do 4x4
+    self.size = size # Dont know if we are going to do 4x4 - I haven't seen much about 4x4. For now we're sticking with size of 3x3 (5x5 larger size later) to meet project requirement.
     return
-  
+
   def switch_player(self):
     """Switch between player 1 and player 2"""
     if self.current_player == 1:
@@ -23,8 +23,14 @@ class Game:
     elif self.current_player == 2:
       self.current_player = 1
     return
-  
-  def get_current_agent(self): 
+
+    # I created this to swap between players. If player 1 is 'X', then player 2 is 'O' for terminal command line interface.
+    # if self.current_player == 'X':
+    #   self.current_player = 'O'
+    # elif self.current_player == 'O':
+    #   self.current_player = 'X'
+
+  def get_current_agent(self):
     """Get the current agent based on the current player"""
     if self.current_player == 1:
         return self.agent1
@@ -46,7 +52,7 @@ class Game:
       print(f"Player {self.get_current_agent()} made a move {move}.")
 
       self.switch_player()  # Switch to the next player
-    
+
     # Game over handling
     winner = self.board.get_winner()
     if winner:
