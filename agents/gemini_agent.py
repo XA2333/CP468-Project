@@ -1,5 +1,5 @@
 """
-Gemini Agent: (still need board.py to integrate this agent)
+Gemini Agent:
 This agent uses Gemini language model to choose moves in Tic Tac Toe by prompting the model with the current board state and valid actions.
 
 Features:
@@ -25,8 +25,8 @@ Setup:
   b) Create a JSON configuration file at 'config/gemini_config.json':
     { "GEMINI_API_KEY": "your_api_key_here" }
 
-Date: 2025-07-03
-Version: 1.0
+Date: 2025-07-06
+Version: 1.1
 """
 import json
 import os
@@ -38,7 +38,7 @@ class GeminiAgent:
   def __init__(self, mark):
     # Initialize the Gemini API agent.
     self.mark = mark
-    # self.opponent_mark = 'O' if mark == 'X' else 'X'
+    self.opponent_mark = 'O' if mark == 'X' else 'X'
     # self.api_configured = False
 
     load_dotenv()
@@ -82,20 +82,45 @@ class GeminiAgent:
     # Main API call logic
     try:
       board_str = self._board_to_string(board)
-      # To improve performance, we can try different prompts
+      # # =========== To improve performance, we can try different prompts ===========
+      # prompt = f"""
+      # You are playing Tic-Tac-Toe.
+      # Your mark is '{self.mark}'.
+      # The opponent's mark: '{self.opponent_mark}'.
+
+      # Current board ({board.size}x{board.size}):
+      # {board_str}
+
+      # Valid moves: {valid_moves}
+
+      # Only make a move from the list. Your response must be in the format: row,col
+      # Example: 1,2
+      # """
+      # ======================
+
       prompt = f"""
-      You are playing Tic-Tac-Toe.
+      You are playing Tic-Tac-Toe as an expert AI.
+      Your goal is to win the game. If you cannot win, ensure a draw. Do not lose.
       Your mark is '{self.mark}'.
       The opponent's mark: '{self.opponent_mark}'.
 
       Current board ({board.size}x{board.size}):
       {board_str}
 
-      Valid moves: {valid_moves}
+      Valid moves (0-indexed row, 0-indexed col): {valid_moves}
 
-      Only make a move from the list. Your response must be in the format: row,col
+      Consider the following strategic priorities for your move:
+      1. Win immediately: If you can make a move to win, do it.
+      2. Block opponent's win: If the opponent can win on their next move, block them.
+      3. Take the center: If available, the center position (1,1) is usually best.
+      4. Take a corner: If available, any corner (0,0), (0,2), (2,0), (2,2) is good.
+      5. Take an edge: If available, any remaining edge position (0,1), (1,0), (1,2), (2,1).
+
+      Only make a move from the 'Valid moves' list.
+      Your response must be only the 0-indexed row and column, separated by a comma.
       Example: 1,2
       """
+
       response = self.model.generate_content(prompt)
       if not response or not response.text:
           raise ValueError("Gemini API returned an empty or invalid response.")
