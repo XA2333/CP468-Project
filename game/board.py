@@ -49,9 +49,13 @@ class Board:
     new_board = Board(self.size)
     new_board.board = self.board.copy()
     new_board.winning_length = self.winning_length
+    new_board.move_log = self.move_log.copy()  # CHANGE: Copy move history too
+    new_board.total_move = self.total_move
 
     # Apply the move to the new board
     new_board.board[row, col] = current_player_mark
+    new_board.move_log.append((row, col, current_player_mark))  # CHANGE: Update move log
+    new_board.total_move += 1  # CHANGE: Update move count
     return new_board
 
   def check_win(self, mark):
@@ -108,8 +112,15 @@ class Board:
     # Returns the current state of the board.
     return self.board.copy()
 
-  # def get_current_player(): pass - implemented in Game class
-  # def reset(): pass
+  def get_current_player(self):
+    # ADDED: Determine whose turn it is based on move count (X goes first)
+    return 'X' if self.total_move % 2 == 0 else 'O'
+
+  def reset(self):
+    # ADDED: Reset the board to initial state
+    self.board = np.full((self.size, self.size), None)
+    self.move_log = []
+    self.total_move = 0
 
   def __str__(self):
     str = ""
