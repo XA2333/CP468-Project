@@ -4,4 +4,4 @@ google.generativeai
 matplotlib
 pandas
 networkx
-dotenv
+python-dotenv
