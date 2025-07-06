@@ -23,10 +23,12 @@ Usage:
 # minimax_agent.py
 
 class MinimaxAgent:
-    def __init__(self, eval_fn, max_depth):
+    def __init__(self, eval_fn, max_depth, mark):
         # Store the evaluation function and maximum search depth for the agent
         self.eval_fn = eval_fn  # Evaluation function
         self.max_depth = max_depth  # Maximum search depth
+        self.mark = mark
+        self.opponent_mark = 'O' if mark == 'X' else 'X'  # Determine opponent's mark
 
     def get_action(self, state):
         # Returns the best action for the current state using the minimax algorithm
@@ -49,7 +51,7 @@ class MinimaxAgent:
             max_eval, best_action = float('-inf'), None
             for action in state.get_legal_actions():
                 # Generate the successor state for each legal action
-                value, _ = self.minimax(state.generate_successor(action), depth - 1, False)
+                value, _ = self.minimax(state.generate_successor(action, self.mark), depth - 1, False)
                 # Update the best value and action if a better value is found
                 if value > max_eval:
                     max_eval, best_action = value, action
@@ -59,7 +61,7 @@ class MinimaxAgent:
             min_eval, best_action = float('inf'), None
             for action in state.get_legal_actions():
                 # Generate the successor state for each legal action
-                value, _ = self.minimax(state.generate_successor(action), depth - 1, True)
+                value, _ = self.minimax(state.generate_successor(action, self.opponent_mark), depth - 1, True)
                 # Update the best value and action if a lower value is found
                 if value < min_eval:
                     min_eval, best_action = value, action

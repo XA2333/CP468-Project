@@ -1,9 +1,9 @@
 """
 Alpha-Beta Pruning Algorithm Implementation
 
-This module implements the Alpha-Beta pruning algorithm, an optimization of the 
-Minimax algorithm for game-playing AI agents. Alpha-Beta pruning reduces the 
-number of nodes evaluated in the search tree by eliminating branches that 
+This module implements the Alpha-Beta pruning algorithm, an optimization of the
+Minimax algorithm for game-playing AI agents. Alpha-Beta pruning reduces the
+number of nodes evaluated in the search tree by eliminating branches that
 cannot possibly influence the final decision.
 
 Key Features:
@@ -32,9 +32,11 @@ Usage:
 import math
 
 class AlphaBetaAgent:
-    def __init__(self, eval_fn, max_depth):
+    def __init__(self, eval_fn, max_depth, mark):
         self.eval_fn = eval_fn  # Evaluation function used to score states
         self.max_depth = max_depth  # Maximum depth to search in the game tree
+        self.mark = mark
+        self.opponent_mark = 'O' if mark == 'X' else 'X'
 
     def get_action(self, state):
         # Returns the best action for the current state using alpha-beta pruning
@@ -52,7 +54,7 @@ class AlphaBetaAgent:
             value, best_action = float('-inf'), None
             # Iterate over all possible legal actions
             for action in state.get_legal_actions():
-                successor = state.generate_successor(action)
+                successor = state.generate_successor(action, self.opponent_mark)
                 new_value, _ = self.alpha_beta(successor, depth - 1, alpha, beta, False)
                 if new_value > value:
                     value, best_action = new_value, action
@@ -66,7 +68,7 @@ class AlphaBetaAgent:
             # Minimizing player's turn
             value, best_action = float('inf'), None
             for action in state.get_legal_actions():
-                successor = state.generate_successor(action)
+                successor = state.generate_successor(action, self.mark)
                 new_value, _ = self.alpha_beta(successor, depth - 1, alpha, beta, True)
                 if new_value < value:
                     value, best_action = new_value, action

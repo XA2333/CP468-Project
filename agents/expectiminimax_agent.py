@@ -15,7 +15,7 @@ Key Features:
 
 Algorithm Structure:
 - Max nodes: Choose action that maximizes expected value
-- Min nodes: Choose action that minimizes expected value  
+- Min nodes: Choose action that minimizes expected value
 - Chance nodes: Compute weighted average of all possible outcomes
 
 Applications:
@@ -37,9 +37,11 @@ Usage:
 import random
 
 class ExpectiminimaxAgent:
-    def __init__(self, eval_fn, max_depth):
+    def __init__(self, eval_fn, max_depth, mark):
         self.eval_fn = eval_fn  # Evaluation function used to evaluate terminal/non-terminal states
         self.max_depth = max_depth  # Maximum search depth for the algorithm
+        self.mark = mark
+        self.opponent_mark = 'O' if mark == 'X' else 'X'
 
     def get_action(self, state):
         # Returns the best action for the current state using the expectiminimax algorithm
@@ -62,7 +64,7 @@ class ExpectiminimaxAgent:
             max_eval, best_action = float('-inf'), None
             for action in state.get_legal_actions():
                 # For each action, simulate the result and evaluate using expectiminimax
-                value, _ = self.expectiminimax(state.generate_successor(action), depth - 1, "chance")
+                value, _ = self.expectiminimax(state.generate_successor(action, self.opponent_mark), depth - 1, "chance")
                 if value > max_eval:
                     max_eval, best_action = value, action
             return max_eval, best_action
@@ -72,7 +74,7 @@ class ExpectiminimaxAgent:
             min_eval, best_action = float('inf'), None
             for action in state.get_legal_actions():
                 # For each action, simulate the result and evaluate using expectiminimax
-                value, _ = self.expectiminimax(state.generate_successor(action), depth - 1, "chance")
+                value, _ = self.expectiminimax(state.generate_successor(action, self.mark), depth - 1, "chance")
                 if value < min_eval:
                     min_eval, best_action = value, action
             return min_eval, best_action
@@ -84,6 +86,6 @@ class ExpectiminimaxAgent:
             prob = 1 / len(actions)  # Assume uniform probability distribution over actions
             for action in actions:
                 # For each possible outcome, calculate its expected value
-                value, _ = self.expectiminimax(state.generate_successor(action), depth - 1, "min")
+                value, _ = self.expectiminimax(state.generate_successor(action, self.mark), depth - 1, "min")
                 total_value += prob * value
             return total_value, None
