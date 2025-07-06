@@ -1,5 +1,5 @@
 """
-Human Agent: (still need board.py to integrate human input)
+Human Agent:
 This agent allows a human player to input their moves in a Tic Tac Toe game through command-line interface (CLI).
 
 Features:
@@ -9,8 +9,8 @@ Features:
 
 No dependencies required.
 
-Date: 2025-07-03
-Version: 1.0
+Date: 2025-07-06
+Version: 1.1
 """
 class HumanAgent:
     def __init__(self, mark):
@@ -30,14 +30,23 @@ class HumanAgent:
             try:
                 # Get the move as a single string
                 move_str = input(f"Player {self.mark}, enter your move as 'row,col' (e.g., '1,2'): ")
+                parts = move_str.split(',')
+                if len(parts) != 2:
+                    raise ValueError("Invalid format. Please use 'row,col'.")
 
                 # Split the input string into row and column
-                row, col = map(int, move_str.split(','))
+                row = int(parts[0].strip())
+                col = int(parts[1].strip())
+
+                # Convert 1-based input to 0-based index for the board (for visualization purposes)
+                row_0_indexed = row - 1
+                col_0_indexed = col - 1
 
                 # Check if the move is valid
-                if (row, col) in valid_moves:
-                    return (row, col)
+                if board.is_valid_move(row_0_indexed, col_0_indexed):
+                    return (row_0_indexed, col_0_indexed)
                 else:
-                    print(f"Invalid move! Pick one of moves that are available: {valid_moves}")
+                    # print(f"Invalid move! Pick one of moves that are available: {valid_moves}") # debug
+                    print(f"Invalid move ({row},{col})! That cell is already taken or out of bounds. Try again.")
             except (ValueError, IndexError):
                 print("Invalid format. Please enter your move as 'row,col' (e.g., '1,2').")
