@@ -7,6 +7,7 @@ import numpy as np
 # It includes methods to check for valid moves, make moves, check for a win, and reset the board.
 # Feel free to add parameters or adjust these functions as needed
 # =========================
+
 class Board:
   def __init__(self, size=3):
     self.size = size
