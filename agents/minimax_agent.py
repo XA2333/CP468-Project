@@ -29,7 +29,7 @@ class MinimaxAgent:
         self.max_depth = max_depth  # Maximum search depth
         self.mark = mark
         self.opponent_mark = 'O' if mark == 'X' else 'X'  # Determine opponent's mark
-
+        self.nodes_expanded = 0 
     def get_action(self, state):
         # Returns the best action for the current state using the minimax algorithm
         # The agent assumes it is the maximizing player at the root
@@ -43,9 +43,10 @@ class MinimaxAgent:
         # maximizing_player: True if it's the maximizing player's turn, False otherwise
 
         # Base case: if the state is terminal or depth limit is reached, evaluate the state
+        self.nodes_expanded += 1
         if state.is_terminal() or depth == 0:
             return self.eval_fn(state), None
-
+  
         if maximizing_player:
             # Maximizing player's turn: try to maximize the evaluation value
             max_eval, best_action = float('-inf'), None
