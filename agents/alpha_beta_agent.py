@@ -37,6 +37,7 @@ class AlphaBetaAgent:
         self.max_depth = max_depth  # Maximum depth to search in the game tree
         self.mark = mark
         self.opponent_mark = 'O' if mark == 'X' else 'X'
+        self.nodes_expanded = 0 # node counter
 
     def get_action(self, state):
         # Returns the best action for the current state using alpha-beta pruning
@@ -46,6 +47,7 @@ class AlphaBetaAgent:
 
     def alpha_beta(self, state, depth, alpha, beta, maximizing_player):
         # Base case: if the state is terminal or depth limit reached, evaluate the state
+        self.nodes_expanded += 1 # increment counter
         if state.is_terminal() or depth == 0:
             return self.eval_fn(state), None
 
