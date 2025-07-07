@@ -15,6 +15,7 @@ Version: 1.1
 class HumanAgent:
     def __init__(self, mark):
         self.mark = mark # 'X' or 'O'
+        self.nodes_expanded = 0  # node counter (always zero)
 
     def get_action(self, board):
         """
