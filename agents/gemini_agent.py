@@ -66,6 +66,7 @@ class GeminiAgent:
         # Catching any exception during API configuration
         print(f"Error configuring Gemini API: {e}. Agent will make random moves.")
         self.api_configured = False
+        self.nodes_expanded = 0  # node counter (always zero)
 
   def get_action(self, board):
     # Get the best move by querying Gemini API
