@@ -274,3 +274,47 @@ class Logger:
             json.dump(comparison, f, indent=2, ensure_ascii=False)
             
         print(f"Performance comparison exported to {filename}")
+
+
+# === Test and Demo Code ===
+# This section demonstrates the Logger functionality
+if __name__ == "__main__":
+    # Create a Logger instance
+    logger = Logger("demo_results.json")
+    
+    print("=== Logger Demo Started ===")
+    
+    # Add some sample game results
+    logger.log_game("minimax", "alphabeta", "X", 7, 0.125, 3, 150, 89)
+    logger.log_game("alphabeta", "random", "O", 5, 0.087, 3, 45, None)
+    logger.log_game("minimax", "random", "Draw", 9, 0.203, 3, 250, None)
+    logger.log_game("alphabeta", "minimax", "X", 6, 0.156, 3, 78, 180)
+    logger.log_game("random", "minimax", "O", 4, 0.034, 3, None, 95)
+    
+    print(f"\nAdded {len(logger.get_logs())} game results")
+    
+    # Display summary
+    logger.print_summary()
+    
+    # Display detailed results (only show last 3)
+    logger.print_detailed_results(limit=3)
+    
+    # Display specific agent performance
+    print("\n=== Minimax Agent Performance Analysis ===")
+    minimax_summary = logger.get_performance_summary("minimax")
+    if 'error' not in minimax_summary:
+        print(f"Total games: {minimax_summary['total_games']}")
+        print(f"Win rate: {minimax_summary['win_rate']:.1f}%")
+        print(f"Draw rate: {minimax_summary['draw_rate']:.1f}%")
+        print(f"Average execution time: {minimax_summary['avg_execution_time']:.3f}s")
+        if minimax_summary['avg_nodes_evaluated']:
+            print(f"Average nodes evaluated: {minimax_summary['avg_nodes_evaluated']:.0f}")
+    
+    # Export performance comparison
+    logger.export_performance_comparison("demo_performance.json")
+    
+    # Save results to files
+    logger.save_to_file("demo_results.json", "json")
+    logger.save_to_file("demo_results.csv", "csv")
+    
+    print("\n=== Logger Demo Completed ===")
