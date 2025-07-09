@@ -170,10 +170,10 @@ class Logger:
                 filename = f"game_results_{timestamp}.json"
             elif format == 'csv':
                 filename = f"game_results_{timestamp}.csv"
-            else:
-                filename = f"game_results_{timestamp}.json"  # default to json
-                
-        # At this point filename is guaranteed to be a string
+
+        if filename is None:
+            raise ValueError("Filename must not be None after auto-generation.")
+
         if format == 'json':
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(self.logs, f, indent=2, ensure_ascii=False)
