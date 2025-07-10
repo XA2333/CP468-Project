@@ -10,11 +10,13 @@ Features:
 No dependencies required.
 
 Date: 2025-07-06
-Version: 1.1
+Version: 1.2
 """
+
 class HumanAgent:
-    def __init__(self, mark):
+    def __init__(self, mark, eval_fn=None, max_depth=None, **kwargs):
         self.mark = mark # 'X' or 'O'
+        self.nodes_expanded = 0  # node counter (always zero)
 
     def get_action(self, board):
         """

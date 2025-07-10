@@ -39,7 +39,7 @@ class GeminiAgent:
     # Initialize the Gemini API agent.
     self.mark = mark
     self.opponent_mark = 'O' if mark == 'X' else 'X'
-    # self.api_configured = False
+    self.api_configured = False
 
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
@@ -156,6 +156,5 @@ class GeminiAgent:
           board_str += f"{cell} "
       board_str += "\n"
     return board_str.strip()
-
 
 

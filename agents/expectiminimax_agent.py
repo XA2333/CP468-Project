@@ -42,10 +42,12 @@ class ExpectiminimaxAgent:
         self.max_depth = max_depth  # Maximum search depth for the algorithm
         self.mark = mark
         self.opponent_mark = 'O' if mark == 'X' else 'X'
+        self.nodes_expanded = 0
 
     def get_action(self, state):
         # Returns the best action for the current state using the expectiminimax algorithm
         # Only the action part is returned; the value is ignored here
+        self.nodes_expanded = 0
         _, action = self.expectiminimax(state, self.max_depth, "max")
         return action
 
@@ -54,7 +56,7 @@ class ExpectiminimaxAgent:
         # state: current game state
         # depth: remaining search depth
         # node_type: "max", "min", or "chance" indicating the type of node
-
+        self.nodes_expanded += 1
         # Base case: if the state is terminal or depth limit reached, evaluate the state
         if state.is_terminal() or depth == 0:
             return self.eval_fn(state), None

@@ -12,8 +12,8 @@ Key Features:
 - Guarantees optimal play assuming both players play perfectly
 
 Author: Game AI Course - CP468
-Date Created: 2025
-Version: 1.0
+Date Created: July 09, 2025
+Version: 1.1
 
 Usage:
     agent = MinimaxAgent(evaluation_function, max_search_depth)
@@ -29,10 +29,12 @@ class MinimaxAgent:
         self.max_depth = max_depth  # Maximum search depth
         self.mark = mark
         self.opponent_mark = 'O' if mark == 'X' else 'X'  # Determine opponent's mark
+        self.nodes_expanded = 0
 
     def get_action(self, state):
         # Returns the best action for the current state using the minimax algorithm
         # The agent assumes it is the maximizing player at the root
+        self.nodes_expanded = 0
         _, action = self.minimax(state, self.max_depth, True)
         return action
 
@@ -41,6 +43,7 @@ class MinimaxAgent:
         # state: current game state
         # depth: remaining search depth
         # maximizing_player: True if it's the maximizing player's turn, False otherwise
+        self.nodes_expanded += 1
 
         # Base case: if the state is terminal or depth limit is reached, evaluate the state
         if state.is_terminal() or depth == 0:
