@@ -61,7 +61,7 @@ python main.py
 - Python: **pygame**, **matplotlib**
 
 ## Collaborators
-[@Isaac Sigethy](https://github.com/Isaac-Sigethy) [@Mahmoud Yousif](https://github.com/Diorski) [@Nguyen Hai Trung Pham](https://github.com/TristanPham2375) [@Shankar Parat](https://github.com/shankarparat) [@Thu Mai](https://github.com/mnathuw) [@Wentao Ma](https://github.com/XA2333) [@Xinping Wang](https://github.com/frankxpw)[@Xinyu Luo](https://github.com/)
+[@Isaac Sigethy](https://github.com/Isaac-Sigethy) [@Mahmoud Yousif](https://github.com/Diorski) [@Nguyen Hai Trung Pham](https://github.com/TristanPham2375) [@Shankar Parat](https://github.com/shankarparat) [@Thu Mai](https://github.com/mnathuw) [@Wentao Ma](https://github.com/XA2333) [@Xinping Wang](https://github.com/frankxpw) [@Xinyu Luo](https://github.com/luoxinyu538)
 
 ## Future improvements
 N/A
