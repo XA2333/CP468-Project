@@ -9,6 +9,8 @@ This project is a multi-agent Tic-Tac-Toe game developed for **Artificial Intell
 | ``.gitignore``             | Ignores when tracking changes and committing code                      |
 | ``requirements.txt``       | List of dependencies to install                              |
 | ``README.md``               | Project overview, setup instructions, and documentation       |
+| ``run_human_vs_ai_cli.py``   | Used to run the CLI       |
+| ``run_human_vs_ai_gui.py``   | Used to run the GUI       |
 | **config/**                   | Configuration files and API key setup           |
 | └── `gemini_settings.json`              | JSON config for Gemini API key                      |
 | **game/**                   | Contains core game logic, rules, and board display           |
@@ -34,7 +36,6 @@ This project is a multi-agent Tic-Tac-Toe game developed for **Artificial Intell
 | **docs/**                   | Final project report and presentation poster                   |
 | └── `CP468-PT-Group8.pptx`            | Final presentation                                     |
 | └── `CP468-PT-Group8.pdf`            | Project report                                    |
-
 ## Agents used
 | Agent | Description |
 |---------------|---------------------------------------------------------------|
