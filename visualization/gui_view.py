@@ -39,7 +39,7 @@ def select_agent(mark):
         ("Expectiminimax", lambda: ExpectiminimaxAgent(eval_fn=eval_fn, max_depth=9, mark=mark)),
     ]
     if GeminiAgent:
-        options.append(("Gemini", lambda: GeminiAgent(mark=mark)))
+        options.append(("Gemini", lambda: GeminiAgent(mark=mark, eval_fn=eval_fn, max_depth=9)))
 
     print(f"Select opponent for Player X:")
     for idx, (name, _) in enumerate(options, start=1):
