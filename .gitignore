@@ -5,3 +5,5 @@ config/gemini_settings.json
 .env
 results/
 pruning visualization/
+*.json
+*.csv
