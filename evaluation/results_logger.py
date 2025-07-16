@@ -46,13 +46,13 @@ class Logger:
                 - agent2_nodes_evaluated: Nodes evaluated by agent 2 (if applicable)
                 - timestamp: When the game was played
         """
-        log_entry = {
-            'session_id': self.session_id,
-            'timestamp': datetime.now().isoformat(),
-            'type': 'summary',
-            **game_result
-        }
-        self.logs.append(log_entry)
+        # Add session ID and timestamp if not provided
+        if 'session_id' not in game_result:
+            game_result['session_id'] = self.session_id
+        if 'timestamp' not in game_result:
+            game_result['timestamp'] = datetime.now().isoformat()
+
+        self.logs.append(game_result)
 
     def log_game(self, agent1_type: str, agent2_type: str, winner: str,
                  total_moves: int, execution_time: float, board_size: int = 3,
@@ -86,29 +86,29 @@ class Logger:
         if additional_data:
             game_result.update(additional_data)
 
-        self.logs.append(game_result)
+        self.log(game_result)
 
-    # def get_logs(self) -> List[Dict[str, Any]]:
-    #     """
-    #     Get all logged results.
+    def get_logs(self) -> List[Dict[str, Any]]:
+        """
+        Get all logged results.
 
-    #     Returns:
-    #         List[Dict]: List of all game results
-    #     """
-    #     return self.logs.copy()
+        Returns:
+            List[Dict]: List of all game results
+        """
+        return self.logs.copy()
 
-    # def get_logs_by_agent(self, agent_type: str) -> List[Dict[str, Any]]:
-    #     """
-    #     Get logs filtered by specific agent type.
+    def get_logs_by_agent(self, agent_type: str) -> List[Dict[str, Any]]:
+        """
+        Get logs filtered by specific agent type.
 
-    #     Args:
-    #         agent_type (str): Type of agent to filter by
+        Args:
+            agent_type (str): Type of agent to filter by
 
-    #     Returns:
-    #         List[Dict]: Filtered game results
-    #     """
-    #     return [log for log in self.logs
-    #             if log.get('agent1_type') == agent_type or log.get('agent2_type') == agent_type]
+        Returns:
+            List[Dict]: Filtered game results
+        """
+        return [log for log in self.logs
+                if log.get('agent1_type') == agent_type or log.get('agent2_type') == agent_type]
 
     def get_performance_summary(self, agent_type: str) -> Dict[str, Any]:
         """
@@ -120,8 +120,7 @@ class Logger:
         Returns:
             Dict: Performance summary including win rate, avg execution time, etc.
         """
-        agent_logs = [log for log in self.logs
-                     if log.get('agent1_type') == agent_type or log.get('agent2_type') == agent_type]
+        agent_logs = self.get_logs_by_agent(agent_type)
 
         if not agent_logs:
             return {'error': f'No logs found for agent type: {agent_type}'}
@@ -161,7 +160,6 @@ class Logger:
     def clear(self):
         """Clear all logged results."""
         self.logs.clear()
-        self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     def save_to_file(self, filename: Optional[str] = None, format: str = 'json'):
         """
@@ -181,34 +179,37 @@ class Logger:
         # Create full path in results folder
         filepath = os.path.join(self.results_folder, filename)
 
-        try:
-            if format == 'json':
-                with open(filepath, 'w', encoding='utf-8') as f:
-                    json.dump(self.logs, f, indent=2, ensure_ascii=False)
-            elif format == 'csv':
-                if self.logs:
-                    with open(filepath, 'w', newline='', encoding='utf-8') as f:
-                        writer = csv.DictWriter(f, fieldnames=self.logs[0].keys())
-                        writer.writeheader()
-                        writer.writerows(self.logs)
+        if format == 'json':
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(self.logs, f, indent=2, ensure_ascii=False)
+        elif format == 'csv':
+            if self.logs:
+                with open(filepath, 'w', newline='', encoding='utf-8') as f:
+                    writer = csv.DictWriter(f, fieldnames=self.logs[0].keys())
+                    writer.writeheader()
+                    writer.writerows(self.logs)
 
-            print(f"Results saved to {filepath}")
-        except Exception as e:
-            print(f"Error saving to file: {e}")
+        print(f"Results saved to {filepath}")
 
-    # def load_from_file(self, filename: str):
-    #     """
-    #     Load logs from a JSON file.
+    def load_from_file(self, filename: str):
+        """
+        Load logs from a JSON file.
 
-    #     Args:
-    #         filename (str): Name of the file to load from
-    #     """
-    #     if os.path.exists(filename):
-    #         with open(filename, 'r', encoding='utf-8') as f:
-    #             self.logs = json.load(f)
-    #         print(f"Loaded {len(self.logs)} results from {filename}")
-    #     else:
-    #         print(f"File {filename} not found")
+        Args:
+            filename (str): Name of the file to load from
+        """
+        # Check if filename includes path, if not, assume it's in results folder
+        if not os.path.dirname(filename):
+            filepath = os.path.join(self.results_folder, filename)
+        else:
+            filepath = filename
+
+        if os.path.exists(filepath):
+            with open(filepath, 'r', encoding='utf-8') as f:
+                self.logs = json.load(f)
+            print(f"Loaded {len(self.logs)} results from {filepath}")
+        else:
+            print(f"File {filepath} not found")
 
     def print_summary(self):
         """Print a summary of all logged results."""
@@ -237,32 +238,32 @@ class Logger:
                 if summary['avg_nodes_evaluated']:
                     print(f"  Avg nodes evaluated: {summary['avg_nodes_evaluated']:.0f}")
 
-    # def print_detailed_results(self, limit: Optional[int] = None):
-    #     """
-    #     Print detailed results of recent games.
+    def print_detailed_results(self, limit: Optional[int] = None):
+        """
+        Print detailed results of recent games.
 
-    #     Args:
-    #         limit (int, optional): Number of recent games to show
-    #     """
-    #     if not self.logs:
-    #         print("No game results to display.")
-    #         return
+        Args:
+            limit (int, optional): Number of recent games to show
+        """
+        if not self.logs:
+            print("No game results to display.")
+            return
 
-    #     logs_to_show = self.logs[-limit:] if limit else self.logs
+        logs_to_show = self.logs[-limit:] if limit else self.logs
 
-    #     print(f"\n=== Detailed Game Results ===")
-    #     for i, log in enumerate(logs_to_show, 1):
-    #         print(f"\nGame {i}:")
-    #         print(f"  {log.get('agent1_type', 'Unknown')} (X) vs {log.get('agent2_type', 'Unknown')} (O)")
-    #         print(f"  Winner: {log.get('winner', 'Unknown')}")
-    #         print(f"  Moves: {log.get('total_moves', 'N/A')}")
-    #         print(f"  Time: {log.get('execution_time', 0):.3f}s")
-    #         if log.get('agent1_nodes_evaluated'):
-    #             print(f"  {log.get('agent1_type')} nodes: {log.get('agent1_nodes_evaluated')}")
-    #         if log.get('agent2_nodes_evaluated'):
-    #             print(f"  {log.get('agent2_type')} nodes: {log.get('agent2_nodes_evaluated')}")
+        print(f"\n=== Detailed Game Results ===")
+        for i, log in enumerate(logs_to_show, 1):
+            print(f"\nGame {i}:")
+            print(f"  {log.get('agent1_type', 'Unknown')} (X) vs {log.get('agent2_type', 'Unknown')} (O)")
+            print(f"  Winner: {log.get('winner', 'Unknown')}")
+            print(f"  Moves: {log.get('total_moves', 'N/A')}")
+            print(f"  Time: {log.get('execution_time', 0):.3f}s")
+            if log.get('agent1_nodes_evaluated'):
+                print(f"  {log.get('agent1_type')} nodes: {log.get('agent1_nodes_evaluated')}")
+            if log.get('agent2_nodes_evaluated'):
+                print(f"  {log.get('agent2_type')} nodes: {log.get('agent2_nodes_evaluated')}")
 
-    def export_performance_comparison(self, filename: str = "overall_performance_comparison.json"):
+    def export_performance_comparison(self, filename: str = "performance_comparison.json"):
         """
         Export performance comparison of all agent types.
 
@@ -283,6 +284,7 @@ class Logger:
             if 'error' not in summary:
                 comparison[agent_type] = summary
 
+
         # Create full path in results folder
         filepath = os.path.join(self.results_folder, filename)
 
@@ -296,5 +298,45 @@ class Logger:
 
 
 
+# === Test and Demo Code ===
+# This section demonstrates the Logger functionality
+if __name__ == "__main__":
+    # Create a Logger instance
+    logger = Logger("demo_results.json")
 
+    print("=== Logger Demo Started ===")
 
+    # Add some sample game results
+    logger.log_game("minimax", "alphabeta", "X", 7, 0.125, 3, 150, 89)
+    logger.log_game("alphabeta", "random", "O", 5, 0.087, 3, 45, None)
+    logger.log_game("minimax", "random", "Draw", 9, 0.203, 3, 250, None)
+    logger.log_game("alphabeta", "minimax", "X", 6, 0.156, 3, 78, 180)
+    logger.log_game("random", "minimax", "O", 4, 0.034, 3, None, 95)
+
+    print(f"\nAdded {len(logger.get_logs())} game results")
+
+    # Display summary
+    logger.print_summary()
+
+    # Display detailed results (only show last 3)
+    logger.print_detailed_results(limit=3)
+
+    # Display specific agent performance
+    print("\n=== Minimax Agent Performance Analysis ===")
+    minimax_summary = logger.get_performance_summary("minimax")
+    if 'error' not in minimax_summary:
+        print(f"Total games: {minimax_summary['total_games']}")
+        print(f"Win rate: {minimax_summary['win_rate']:.1f}%")
+        print(f"Draw rate: {minimax_summary['draw_rate']:.1f}%")
+        print(f"Average execution time: {minimax_summary['avg_execution_time']:.3f}s")
+        if minimax_summary['avg_nodes_evaluated']:
+            print(f"Average nodes evaluated: {minimax_summary['avg_nodes_evaluated']:.0f}")
+
+    # Export performance comparison
+    logger.export_performance_comparison("demo_performance.json")
+
+    # Save results to files
+    logger.save_to_file("demo_results.json", "json")
+    logger.save_to_file("demo_results.csv", "csv")
+
+    print("\n=== Logger Demo Completed ===")
