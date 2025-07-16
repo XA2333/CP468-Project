@@ -1,15 +1,12 @@
 # === Import libraries and modules ===
 # Place all your import statements here
 # =========================================
-import pygame
-import os,sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from game.board import Board
 from game.game import Game
-from agents.human_agent import HumanAgent
-from agents.minimax_agent import MinimaxAgent
-from agents.alpha_beta_agent import AlphaBetaAgent
-from agents.expectiminimax_agent import ExpectiminimaxAgent
+from game.board import Board
+import pygame
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 try:
     from agents.gemini_agent import GeminiAgent
 except ImportError:
@@ -24,6 +21,8 @@ X_COLOR = (84, 84, 84)
 O_COLOR = (242, 235, 211)
 
 # Simple evaluation function
+
+
 def eval_fn(board):
     winner = board.get_winner()
     if winner == 'O': return 1
@@ -31,7 +30,15 @@ def eval_fn(board):
     return 0
 
 # Same select_agent helper for GUI
+
+
 def select_agent(mark):
+    # ===== Import agents locally to avoid circular imports =====
+    from agents.expectiminimax_agent import ExpectiminimaxAgent
+    from agents.alpha_beta_agent import AlphaBetaAgent
+    from agents.minimax_agent import MinimaxAgent
+    from agents.human_agent import HumanAgent
+
     options = [
         ("Human", lambda: HumanAgent(mark=mark)),
         ("Minimax", lambda: MinimaxAgent(mark=mark, eval_fn=eval_fn, max_depth=9)),
@@ -52,8 +59,12 @@ def select_agent(mark):
                 return options[idx-1][1]()
         print("Invalid choice, try again.")
 
+
 class GUIView:
     def __init__(self, board_size=3, agent1=None, agent2=None):
+        # ===== Import agents locally to avoid circular imports =====
+        from agents.human_agent import HumanAgent
+
         pygame.init()
         self.board = Board(size=board_size)
         self.agent1 = agent1 or HumanAgent(mark='X')
@@ -92,6 +103,9 @@ class GUIView:
                                            center, CELL_SIZE // 3, LINE_WIDTH)
 
     def run(self):
+        # ===== Import agents locally to avoid circular imports =====
+        from agents.human_agent import HumanAgent
+
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -124,7 +138,11 @@ class GUIView:
 
         pygame.quit()
 
+
 if __name__ == '__main__':
+    # ===== Import agents locally to avoid circular imports =====
+    from agents.human_agent import HumanAgent
+
     opp = select_agent(mark='O')
     view = GUIView(agent1=HumanAgent(mark='X'), agent2=opp)
     view.run()

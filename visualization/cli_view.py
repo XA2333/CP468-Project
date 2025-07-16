@@ -1,15 +1,11 @@
 # === Import libraries and modules ===
 # Place all your import statements here
 # =========================================
+from game.game import Game
+from game.board import Board
 import os, sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from game.board import Board
-from game.game import Game
-from agents.human_agent import HumanAgent
-from agents.minimax_agent import MinimaxAgent
-from agents.alpha_beta_agent import AlphaBetaAgent
-from agents.expectiminimax_agent import ExpectiminimaxAgent
 try:
     from agents.gemini_agent import GeminiAgent
 except ImportError:
@@ -20,6 +16,12 @@ def eval_fn(board):
     return 1 if winner == 'O' else (-1 if winner == 'X' else 0)
 
 def select_agent(mark):
+    # ===== Import agents locally to avoid circular imports =====
+    from agents.expectiminimax_agent import ExpectiminimaxAgent
+    from agents.alpha_beta_agent import AlphaBetaAgent
+    from agents.minimax_agent import MinimaxAgent
+    from agents.human_agent import HumanAgent
+
     options = [
         ("Human",      lambda: HumanAgent(mark=mark)),
         ("Minimax",    lambda: MinimaxAgent(mark=mark, eval_fn=eval_fn, max_depth=9)),
@@ -41,6 +43,9 @@ def select_agent(mark):
 
 class CLIView:
     def __init__(self, board_size=3, agent1=None, agent2=None):
+        # ===== Import agents locally to avoid circular imports =====
+        from agents.human_agent import HumanAgent
+
         self.board = Board(size=board_size)
         self.agent1 = agent1 or HumanAgent(mark='X')
         self.agent2 = agent2 or HumanAgent(mark='O')
@@ -78,6 +83,9 @@ class CLIView:
             print("Game Over: It's a draw.")
 
 if __name__ == '__main__':
+    # ===== Import agents locally to avoid circular imports =====
+    from agents.human_agent import HumanAgent
+
     opp = select_agent(mark='O')      # <-- now Pylance sees this function!
     view = CLIView(agent1=HumanAgent('X'), agent2=opp)
     view.run()
