@@ -5,6 +5,8 @@ from datetime import datetime
 from game import Game, Board
 from agents import MinimaxAgent, AlphaBetaAgent, ExpectiminimaxAgent, GeminiAgent, HumanAgent
 from evaluation import Metrics, Logger
+from visualization.tree_diagram import TreeDiagram
+from visualization.gui_view import GUIView
 # ====================
 
 # This is a placeholder for the main module of the game.
@@ -79,7 +81,29 @@ def play_one_match(agent1_type: str, agent2_type: str, board_size: int = 3, max_
         game = Game(board, agent1, agent2)
 
         start_time = time.time()
-        game.play()
+
+        while not board.is_game_over():
+            agent = game.get_current_agent()
+            move = agent.get_action(board)
+            board.make_move(*move, game.current_player)
+
+            print(f"\nPlayer {game.current_player} played: {move}")
+            print(board)
+
+            # Show pruning visualization if AlphaBetaAgent
+            if isinstance(agent, AlphaBetaAgent):
+                print("Visualizing Alpha-Beta pruning tree for this move...")
+                if hasattr(agent, 'last_search_tree') and agent.last_search_tree is not None:
+                    TreeDiagram(agent.last_search_tree).draw(
+                        title=f"Alpha-Beta Tree - Player {game.current_player}")
+                else:
+                    print("No search tree available for visualization.")
+
+            if board.is_game_over():
+                break
+
+            game.switch_player()
+
         end_time = time.time()
 
         # Extract results manually
@@ -370,10 +394,174 @@ def run_user_match():
         if agent1 and agent2:
             board = Board(size=3)
             game = Game(board, agent1, agent2)
-            game.play()
+
+            while not board.is_game_over():
+                agent = game.get_current_agent()
+                move = agent.get_action(board)
+                board.make_move(*move, game.current_player)
+
+                print(f"\nPlayer {game.current_player} played: {move}")
+                print(board)
+
+                # Show pruning visualization if AlphaBetaAgent
+                if isinstance(agent, AlphaBetaAgent):
+                    print("Visualizing Alpha-Beta pruning tree for this move...")
+                    if hasattr(agent, 'last_search_tree') and agent.last_search_tree is not None:
+                        # Draw the tree diagram
+                        TreeDiagram(agent.last_search_tree).draw(
+                            title=f"Alpha-Beta Tree - Player {game.current_player}")
+                    else:
+                        print("No search tree available for visualization.")
+
+                if board.is_game_over():
+                    break
+
+                game.switch_player()
     else:
         # Use regular play_one_match
         play_one_match(agent1_type, agent2_type, 3, 6)
+
+def run_alpha_beta_visualization_test():
+    # Run Alpha-Beta pruning visualization test (from pruning_visual_test.py)
+    print("\nAlpha-Beta Pruning Visualization Test")
+    print("Options: minimax, alphabeta, expectiminimax, gemini, human")
+
+    opponent_type = input("Enter agent type for Player O: ").strip().lower()
+
+    valid_agents = ['minimax', 'alphabeta', 'expectiminimax', 'gemini', 'human']
+    if opponent_type not in valid_agents:
+        print("Invalid agent type. Please use one of:", valid_agents)
+        return
+
+    # Simple evaluation function
+    def simple_eval_fn(board):
+        winner = board.get_winner()
+        if winner == 'X':
+            return 1
+        elif winner == 'O':
+            return -1
+        return 0
+
+    try:
+        # Create agents with simpler evaluation function and lower depth
+        agent1 = AlphaBetaAgent(eval_fn=simple_eval_fn, max_depth=4, mark='X')
+
+        # Create opponent agent
+        if opponent_type in ['alphabeta', 'minimax', 'expectiminimax', 'gemini']:
+            agent2 = get_agent(opponent_type, 'O', max_depth=4)
+            # Override eval function to match test
+            if hasattr(agent2, 'eval_fn'):
+                agent2.eval_fn = simple_eval_fn
+        else:
+            agent2 = get_agent(opponent_type, 'O', max_depth=4)
+
+        if not agent1 or not agent2:
+            print("Error: Could not create agents.")
+            return
+
+        board = Board(size=3)
+        game = Game(board, agent1, agent2)
+
+        print(f"Starting game: AlphaBetaAgent (X) vs {opponent_type.upper()} (O)")
+        print("Watch for Alpha-Beta pruning tree visualizations after each AlphaBetaAgent move!\n")
+
+        while not board.is_game_over():
+            agent = game.get_current_agent()
+            move = agent.get_action(board)
+            board.make_move(*move, game.current_player)
+
+            print(f"Player {game.current_player} played: {move}")
+            print(board)
+
+            # Show pruning visualization if AlphaBetaAgent
+            if isinstance(agent, AlphaBetaAgent):
+                print("Visualizing Alpha-Beta pruning tree for this move...")
+                if hasattr(agent, 'last_search_tree') and agent.last_search_tree is not None:
+                    TreeDiagram(agent.last_search_tree).draw(
+                        title=f"Alpha-Beta Tree - Player {game.current_player}")
+                else:
+                    print("No search tree available for visualization.")
+
+            if board.is_game_over():
+                break
+
+            game.switch_player()
+
+        winner = board.get_winner()
+        print(f"\nGame Over! Winner: {winner}" if winner else "\nIt's a draw.")
+
+    except Exception as e:
+        print(f"Error during visualization test: {e}")
+        return
+
+def run_single_match_gui():
+    """Run a single match (GUI) where any agent can play against any agent."""
+    from agents.human_agent import HumanAgent
+    from agents.minimax_agent import MinimaxAgent
+    from agents.alpha_beta_agent import AlphaBetaAgent
+    from agents.expectiminimax_agent import ExpectiminimaxAgent
+    from agents.gemini_agent import GeminiAgent
+    from visualization.gui_view import GUIView
+
+    print("\nSingle match setup")
+    valid_agents = ['minimax', 'alphabeta', 'expectiminimax', 'gemini', 'human']
+    print(f"Available agents: {', '.join(valid_agents)}")
+
+    agent1_type = 'human' # Always start with human for GUI
+    agent2_type = input("Enter agent 2 type (O): ").strip().lower()
+
+    if agent1_type not in valid_agents or agent2_type not in valid_agents:
+        print("Invalid agent type. Please use one of:", valid_agents)
+        return
+
+    try:
+        # Import pygame to check if it's available
+        import pygame
+
+        # Simple evaluation function for AI agents
+        def gui_eval_fn(board):
+            winner = board.get_winner()
+            if winner == 'O': return 1
+            if winner == 'X': return -1
+            return 0
+
+        board_size = 3  # Default board size
+
+        # Create agents - Player 1 is always human
+        agent1 = HumanAgent(mark='X')
+
+        # For Player 2, use the type selected by the user
+        if agent2_type == 'human':
+            agent2 = HumanAgent(mark='O')
+        elif agent2_type == 'minimax':
+            agent2 = MinimaxAgent(mark='O', eval_fn=gui_eval_fn, max_depth=9)
+        elif agent2_type == 'alphabeta':
+            agent2 = AlphaBetaAgent(eval_fn=gui_eval_fn, max_depth=9, mark='O')
+        elif agent2_type == 'expectiminimax':
+            agent2 = ExpectiminimaxAgent(eval_fn=gui_eval_fn, max_depth=9, mark='O')
+        elif agent2_type == 'gemini':
+            agent2 = GeminiAgent(mark='O', eval_fn=gui_eval_fn, max_depth=9)
+
+        # Create and run GUI
+        print(f"\nStarting GUI game on {board_size}x{board_size} board...")
+        print(f"Player 1 (X): HUMAN vs Player 2 (O): {agent2_type.upper()}")
+        print("Instructions:")
+        print("- X moves first, O moves second")
+        print("- Click on empty cells to make moves")
+        print("- AI agents will move automatically")
+        print("- Close the window to end the game")
+
+        gui_view = GUIView(board_size=board_size, agent1=agent1, agent2=agent2)
+        gui_view.run()
+
+    except ImportError:
+        print("Error: pygame is not installed. Please install pygame to use GUI mode:")
+        print("pip install pygame")
+        return
+    except Exception as e:
+        print(f"Error during GUI game: {e}")
+        return
+
 
 #  Menu Functions
 def display_evaluation_options():
@@ -411,18 +599,24 @@ def display_evaluation_options():
 def main():
     # Main entry point
     while True:
-        print("Tic Tac Toe game")
-        print("1. Run a single match")
-        print("2. Evaluation menu")
-        print("3. Exit")
+        print("\nTic Tac Toe Game")
+        print("1. Run a single match (CLI)")
+        print("2. Run a single match (GUI)")
+        print("3. Alpha-Beta pruning visualization test")
+        print("4. Evaluation menu")
+        print("5. Exit")
 
-        choice = input("Enter choice (1-3): ").strip()
+        choice = input("Enter choice (1-5): ").strip()
 
         if choice == '1':
             run_user_match()
         elif choice == '2':
-            display_evaluation_options()
+            run_single_match_gui()
         elif choice == '3':
+            run_alpha_beta_visualization_test()
+        elif choice == '4':
+            display_evaluation_options()
+        elif choice == '5':
             print("Goodbye!")
             break
         else:
