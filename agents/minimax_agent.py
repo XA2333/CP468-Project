@@ -11,7 +11,7 @@ Key Features:
 - Uses an evaluation function to score terminal or depth-limited states
 - Guarantees optimal play assuming both players play perfectly
 
-Author: Game AI Course - CP468
+Author:Wentao Ma
 Date Created: July 09, 2025
 Version: 1.1
 

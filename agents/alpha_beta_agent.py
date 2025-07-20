@@ -18,7 +18,7 @@ Algorithm Details:
 - Beta: Best value that the minimizing player can guarantee
 - Pruning occurs when alpha >= beta (no need to explore further)
 
-Author: Game AI Course - CP468
+Author:Wentao Ma
 Date Created: July 16, 2025
 Version: 1.2
 

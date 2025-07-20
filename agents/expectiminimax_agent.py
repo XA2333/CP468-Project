@@ -23,7 +23,7 @@ Applications:
 - Card games with hidden information
 - Games with random events or uncertain opponent behavior
 
-Author: Game AI Course - CP468
+Author:Wentao Ma
 Date Created: 2025
 Version: 1.0
 
